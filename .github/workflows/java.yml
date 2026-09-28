@@ -1,0 +1,42 @@
+name: Java
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: ["8", "21"]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+
+      - name: Download JUnit 4
+        run: |
+          mkdir -p lib
+          curl -sSfL -o lib/junit-4.13.2.jar https://repo1.maven.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar
+          curl -sSfL -o lib/hamcrest-core-1.3.jar https://repo1.maven.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar
+
+      - name: Compile, run demos and tests
+        run: |
+          javac_flags="-source 8 -target 8 -Xlint:all,-options -Werror -encoding UTF-8"
+          for lesson in java/*/; do
+            echo "::group::${lesson}"
+            out="build/${lesson}"
+            javac $javac_flags -d "${out}main" $(find "${lesson}src" -name '*.java')
+            javac $javac_flags -cp "${out}main:lib/*" -d "${out}test" $(find "${lesson}test" -name '*.java')
+            for demo in $(cd "${lesson}src" && find . -name '*Demo.java' | sed 's|^\./||; s|\.java$||; s|/|.|g'); do
+              java -cp "${out}main" "$demo" > /dev/null
+            done
+            tests=$(cd "${lesson}test" && find . -name '*Test.java' | sed 's|^\./||; s|\.java$||; s|/|.|g')
+            java -cp "${out}main:${out}test:lib/*" org.junit.runner.JUnitCore $tests
+            echo "::endgroup::"
+          done
