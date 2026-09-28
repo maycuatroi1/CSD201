@@ -41,6 +41,7 @@ không được phép có trên cây AVL.
 ## Chạy
 
 ```bash
+mkdir -p out
 javac -d out $(find src -name "*.java")
 java -cp out csd201.tree.general.FileSystemDemo
 java -cp out csd201.tree.binary.ExpressionTreeDemo

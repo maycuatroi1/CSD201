@@ -31,6 +31,7 @@ jobs:
           for lesson in java/*/; do
             echo "::group::${lesson}"
             out="build/${lesson}"
+            mkdir -p "${out}main" "${out}test"
             javac $javac_flags -d "${out}main" $(find "${lesson}src" -name '*.java')
             javac $javac_flags -cp "${out}main:lib/*" -d "${out}test" $(find "${lesson}test" -name '*.java')
             for demo in $(cd "${lesson}src" && find . -name '*Demo.java' | sed 's|^\./||; s|\.java$||; s|/|.|g'); do

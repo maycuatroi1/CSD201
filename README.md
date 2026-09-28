@@ -39,6 +39,7 @@ File project do IDE sinh ra đã nằm trong `.gitignore`.
 macOS, Linux hoặc Git Bash trên Windows, đứng trong thư mục bài (ví dụ `java/trees`):
 
 ```bash
+mkdir -p out
 javac -d out $(find src -name "*.java")
 java -cp out csd201.tree.bst.BinarySearchTreeDemo
 ```
