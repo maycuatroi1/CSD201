@@ -5,18 +5,20 @@ Goldwasser, *Data Structures and Algorithms in Java*, 6th edition.
 
 ## Nội dung
 
-| Bài | Thư mục | Syllabus |
+| Bài | Package | Syllabus |
 |---|---|---|
-| Cây: cây tổng quát, cây nhị phân, duyệt cây, BST, AVL | [`java/trees`](java/trees) | 4.1 đến 4.7 |
+| Cây: cây tổng quát, cây nhị phân, duyệt cây, BST, AVL | [`tree`](tree) | 4.1 đến 4.7 |
 
 ## Cách tổ chức
 
-Mỗi bài là một thư mục độc lập, chỉ gồm file `.java`:
+Mỗi bài là một package nằm ngay ở thư mục gốc, chỉ gồm file `.java`. Unit test để riêng trong
+`test/`, cùng tên package:
 
 ```
-java/<bài>/
-  src/    code mẫu, các class *Demo có hàm main để chạy thử
-  test/   unit test JUnit 4 cho code trong src/
+tree/                 code mẫu của bài cây
+  sample/             Student và các class *Demo có hàm main để chạy thử
+test/
+  tree/               unit test JUnit 4 cho package tree
 ```
 
 Repo không kèm Maven, Gradle hay file project của IDE. Code chỉ dùng cú pháp Java 8, nên biên dịch
@@ -24,24 +26,33 @@ Repo không kèm Maven, Gradle hay file project của IDE. Code chỉ dùng cú 
 
 ## Mở trong IDE
 
+Mở thư mục gốc của repo. Source root là chính thư mục gốc (package `tree` nằm ngay bên dưới),
+test root là `test/`, và thêm JUnit 4 vào classpath của phần test.
+
 - **NetBeans**: File > New Project > Java (NetBeans 8) hoặc Java with Ant (bản mới) > Java Project
-  with Existing Sources. Thêm `src` vào Source Package Folders, `test` vào Test Package Folders.
-- **Eclipse**: tạo Java Project mới, bỏ chọn *Use default location* và trỏ tới thư mục bài
-  (ví dụ `java/trees`). Nếu `test` chưa là source folder: chuột phải > Build Path >
-  Use as Source Folder. Thêm JUnit 4 vào Build Path.
-- **IntelliJ IDEA, VS Code**: mở thư mục bài, đánh dấu `src` là source root và `test` là
-  test source root.
+  with Existing Sources. Source Package Folders chọn thư mục gốc, Test Package Folders chọn `test`.
+- **Eclipse**: tạo Java Project mới, bỏ chọn *Use default location* và trỏ tới thư mục gốc. Chuột
+  phải `test` > Build Path > Use as Source Folder. Eclipse sẽ đề nghị loại `test/` khỏi source
+  gốc, chọn đồng ý.
+- **IntelliJ IDEA, VS Code**: mở thư mục gốc, đánh dấu thư mục gốc là source root và `test` là test
+  source root.
 
 File project do IDE sinh ra đã nằm trong `.gitignore`.
 
 ## Chạy bằng dòng lệnh
 
-macOS, Linux hoặc Git Bash trên Windows, đứng trong thư mục bài (ví dụ `java/trees`):
+Đứng ở thư mục gốc của repo. Với JDK 22 trở lên, chạy thẳng từ file nguồn:
+
+```bash
+java tree/sample/StudentTreeDemo.java
+```
+
+Với JDK 8 đến 21 thì biên dịch trước (macOS, Linux hoặc Git Bash trên Windows):
 
 ```bash
 mkdir -p out
-javac -d out $(find src -name "*.java")
-java -cp out csd201.tree.sample.StudentTreeDemo
+javac -d out $(find tree -name "*.java")
+java -cp out tree.sample.StudentTreeDemo
 ```
 
 Chạy test cần hai file jar của JUnit 4:
@@ -54,7 +65,7 @@ javac -d out -cp "out:lib/*" $(find test -name "*.java")
 java -cp "out:lib/*" org.junit.runner.JUnitCore $(cd test && find . -name "*Test.java" | sed 's|^\./||; s|\.java$||; s|/|.|g')
 ```
 
-GitHub Actions chạy đúng các bước trên với JDK 8 và JDK 21 ở mỗi lần push.
+GitHub Actions chạy đúng các bước trên với JDK 8 và JDK 21 ở mỗi lần push, kể cả chạy mọi `*Demo`.
 
 ## Quy ước viết code
 

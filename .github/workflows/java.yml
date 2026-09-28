@@ -28,16 +28,13 @@ jobs:
       - name: Compile, run demos and tests
         run: |
           javac_flags="-source 8 -target 8 -Xlint:all,-options -Werror -encoding UTF-8"
-          for lesson in java/*/; do
-            echo "::group::${lesson}"
-            out="build/${lesson}"
-            mkdir -p "${out}main" "${out}test"
-            javac $javac_flags -d "${out}main" $(find "${lesson}src" -name '*.java')
-            javac $javac_flags -cp "${out}main:lib/*" -d "${out}test" $(find "${lesson}test" -name '*.java')
-            for demo in $(cd "${lesson}src" && find . -name '*Demo.java' | sed 's|^\./||; s|\.java$||; s|/|.|g'); do
-              java -cp "${out}main" "$demo" > /dev/null
-            done
-            tests=$(cd "${lesson}test" && find . -name '*Test.java' | sed 's|^\./||; s|\.java$||; s|/|.|g')
-            java -cp "${out}main:${out}test:lib/*" org.junit.runner.JUnitCore $tests
+          mkdir -p build/main build/test
+          javac $javac_flags -d build/main $(find . -name '*.java' -not -path './test/*')
+          javac $javac_flags -cp "build/main:lib/*" -d build/test $(find test -name '*.java')
+          for demo in $(find . -name '*Demo.java' -not -path './test/*' | sed 's|^\./||; s|\.java$||; s|/|.|g'); do
+            echo "::group::${demo}"
+            java -cp build/main "$demo"
             echo "::endgroup::"
           done
+          tests=$(cd test && find . -name '*Test.java' | sed 's|^\./||; s|\.java$||; s|/|.|g')
+          java -cp "build/main:build/test:lib/*" org.junit.runner.JUnitCore $tests
