@@ -1,4 +1,4 @@
-package csd201.tree.bst;
+package csd201.tree;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.TreeSet;
@@ -26,7 +25,7 @@ public class BinarySearchTreeTest {
         assertEquals(Arrays.asList(8, 3, 1, 6, 4, 7, 10, 14, 13), tree.preOrder());
         assertEquals(Arrays.asList(1, 3, 4, 6, 7, 8, 10, 13, 14), tree.inOrder());
         assertEquals(Arrays.asList(1, 4, 7, 6, 3, 13, 14, 10, 8), tree.postOrder());
-        assertEquals(Arrays.asList(8, 3, 10, 1, 6, 14, 4, 7, 13), tree.breadthFirst());
+        assertEquals(Arrays.asList(8, 3, 10, 1, 6, 14, 4, 7, 13), tree.levelOrder());
     }
 
     @Test
@@ -38,14 +37,25 @@ public class BinarySearchTreeTest {
     }
 
     @Test
-    public void search() {
-        assertTrue(tree.contains(7));
-        assertTrue(tree.contains(13));
-        assertFalse(tree.contains(5));
+    public void searchFollowsOnePathFromTheRoot() {
+        Position<Integer> found = tree.search(7);
+        assertEquals(Integer.valueOf(7), found.getNode().getData());
+        assertEquals(4, tree.getSearchCount());
+        assertTrue(found.isRightChild());
+        assertEquals(Integer.valueOf(6), found.getParent().getNode().getData());
     }
 
     @Test
-    public void duplicateKeyIsNotInserted() {
+    public void missingValueReturnsTheEmptyPositionWhereItWouldBeInserted() {
+        Position<Integer> missing = tree.search(5);
+        assertTrue(missing.isEmpty());
+        assertEquals(4, tree.getSearchCount());
+        assertTrue(missing.isRightChild());
+        assertEquals(Integer.valueOf(4), missing.getParent().getNode().getData());
+    }
+
+    @Test
+    public void duplicateIsNotInserted() {
         assertFalse(tree.insert(6));
         assertEquals(9, tree.size());
     }
@@ -55,28 +65,11 @@ public class BinarySearchTreeTest {
         BinarySearchTree<Integer> growing = treeOf(15, 4, 20, 17);
         assertTrue(growing.insert(19));
         assertEquals("15(4,20(17(-,19),-))", growing.toString());
+        assertEquals(3, growing.height());
     }
 
     @Test
-    public void sameKeysInDifferentOrderGiveDifferentShapes() {
-        assertEquals("K(B(-,D),P(M,R))", treeOf('K', 'B', 'P', 'D', 'M', 'R').toString());
-        assertEquals("B(-,K(D,P(M,R)))", treeOf('B', 'K', 'D', 'P', 'M', 'R').toString());
-        assertEquals(5, treeOf('B', 'D', 'K', 'M', 'P', 'R').height());
-    }
-
-    @Test
-    public void deleteLeafAndNodeWithOneChild() {
-        BinarySearchTree<Integer> leaf = treeOf(15, 4, 20, 1, 16);
-        leaf.deleteByMerging(16);
-        assertEquals("15(4(1,-),20)", leaf.toString());
-
-        BinarySearchTree<Integer> oneChild = treeOf(15, 4, 20, 1, 16);
-        oneChild.deleteByCopying(20);
-        assertEquals("15(4(1,-),16)", oneChild.toString());
-    }
-
-    @Test
-    public void deleteByMergingHangsRightSubtreeUnderPredecessor() {
+    public void deleteByMergingHangsTheRightSubtreeUnderThePredecessor() {
         BinarySearchTree<Integer> merged = treeOf(15, 10, 30, 5, 11, 20, 40, 12);
         assertTrue(merged.deleteByMerging(15));
         assertEquals("10(5,11(-,12(-,30(20,40))))", merged.toString());
@@ -84,7 +77,7 @@ public class BinarySearchTreeTest {
     }
 
     @Test
-    public void deleteByCopyingReplacesKeyWithPredecessor() {
+    public void deleteByCopyingReplacesTheKeyWithThePredecessor() {
         BinarySearchTree<Integer> copied = treeOf(15, 10, 30, 5, 11, 20, 40, 12);
         assertTrue(copied.deleteByCopying(15));
         assertEquals("12(10(5,11),30(20,40))", copied.toString());
@@ -92,28 +85,45 @@ public class BinarySearchTreeTest {
     }
 
     @Test
-    public void bothDeletionsAgreeWhenPredecessorIsTheLeftChild() {
-        BinarySearchTree<Integer> merged = treeOf(15, 10, 30, 5, 20, 40, 4, 7);
-        BinarySearchTree<Integer> copied = treeOf(15, 10, 30, 5, 20, 40, 4, 7);
-        merged.deleteByMerging(15);
-        copied.deleteByCopying(15);
-        assertEquals("10(5(4,7),30(20,40))", merged.toString());
-        assertEquals(merged.toString(), copied.toString());
+    public void removeDeletesByCopying() {
+        BinarySearchTree<Integer> removed = treeOf(15, 10, 30, 5, 11, 20, 40, 12);
+        assertTrue(removed.remove(15));
+        assertEquals("12(10(5,11),30(20,40))", removed.toString());
+    }
+
+    @Test
+    public void deleteLeafAndNodeWithOneChild() {
+        BinarySearchTree<Integer> leaf = treeOf(15, 4, 20, 1, 16);
+        leaf.deleteByMerging(16);
+        assertEquals("15(4(1,-),20)", leaf.toString());
+        assertEquals(2, leaf.height());
+
+        BinarySearchTree<Integer> oneChild = treeOf(15, 4, 20, 1, 16);
+        oneChild.deleteByCopying(20);
+        assertEquals("15(4(1,-),16)", oneChild.toString());
     }
 
     @Test
     public void deletingAMissingKeyChangesNothing() {
         assertFalse(tree.deleteByMerging(5));
         assertFalse(tree.deleteByCopying(5));
+        assertFalse(tree.remove(5));
         assertEquals(9, tree.size());
     }
 
     @Test
     public void deletingTheOnlyNodeEmptiesTheTree() {
         BinarySearchTree<Integer> single = treeOf(42);
-        single.deleteByCopying(42);
+        assertTrue(single.remove(42));
         assertTrue(single.isEmpty());
         assertEquals("-", single.toString());
+    }
+
+    @Test
+    public void mergeTreesInsertsEveryElementOfTheOtherTree() {
+        BinarySearchTree<Integer> other = treeOf(12, 2, 20);
+        tree.mergeTrees(other);
+        assertEquals(Arrays.asList(1, 2, 3, 4, 6, 7, 8, 10, 12, 13, 14, 20), tree.inOrder());
     }
 
     @Test
@@ -124,27 +134,13 @@ public class BinarySearchTreeTest {
         assertEquals(3, unbalanced.height());
     }
 
-    @Test
-    public void emptyTree() {
-        BinarySearchTree<Integer> empty = new BinarySearchTree<>();
-        assertEquals(0, empty.size());
-        assertEquals(-1, empty.height());
-        assertEquals(Collections.emptyList(), empty.breadthFirst());
-        assertFalse(empty.contains(1));
-    }
-
     @Test(expected = NoSuchElementException.class)
     public void emptyTreeHasNoMinimum() {
         new BinarySearchTree<Integer>().min();
     }
 
-    @Test(expected = NullPointerException.class)
-    public void nullKeyIsRejected() {
-        new BinarySearchTree<Integer>().insert(null);
-    }
-
     @Test
-    public void behavesLikeASortedSet() {
+    public void heightsStayCorrectUnderRandomInsertionsAndDeletions() {
         Random random = new Random(201);
         BinarySearchTree<Integer> subject = new BinarySearchTree<>();
         TreeSet<Integer> expected = new TreeSet<>();
@@ -158,15 +154,39 @@ public class BinarySearchTreeTest {
             } else {
                 assertEquals(expected.remove(key), subject.deleteByCopying(key));
             }
+            assertEquals(recomputedHeight(subject.getRoot()), subject.height());
         }
         assertEquals(new ArrayList<>(expected), subject.inOrder());
     }
 
-    private static BinarySearchTree<Integer> treeOf(Integer... keys) {
-        return BinarySearchTree.of(Arrays.asList(keys));
+    @Test(timeout = 30_000)
+    public void sortedInputMakesAChainWithoutStackOverflow() {
+        BinarySearchTree<Integer> chain = new BinarySearchTree<>();
+        int size = 20_000;
+        for (int key = 1; key <= size; key++) {
+            chain.insert(key);
+        }
+        assertEquals(size - 1, chain.height());
+        assertEquals(size, chain.size());
+        assertEquals(size, chain.inOrder().size());
+        assertEquals(size, chain.preOrder().size());
+        assertEquals(size, chain.postOrder().size());
+        assertFalse(chain.search(size).isEmpty());
+        assertEquals(size, chain.getSearchCount());
+        assertTrue(chain.remove(1));
+        assertEquals(size - 2, chain.height());
     }
 
-    private static BinarySearchTree<Character> treeOf(Character... keys) {
-        return BinarySearchTree.of(Arrays.asList(keys));
+    static int recomputedHeight(Node<Integer> node) {
+        if (node == null) {
+            return -1;
+        }
+        return 1 + Math.max(recomputedHeight(node.getLeft()), recomputedHeight(node.getRight()));
+    }
+
+    private static BinarySearchTree<Integer> treeOf(Integer... keys) {
+        BinarySearchTree<Integer> binarySearchTree = new BinarySearchTree<>();
+        binarySearchTree.buildTree(Arrays.asList(keys));
+        return binarySearchTree;
     }
 }

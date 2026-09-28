@@ -1,5 +1,6 @@
-package csd201.tree.general;
+package csd201.tree.sample;
 
+import csd201.tree.general.GeneralTree;
 import csd201.tree.general.GeneralTree.Node;
 import java.util.Collections;
 

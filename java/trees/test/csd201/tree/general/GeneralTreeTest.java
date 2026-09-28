@@ -81,11 +81,11 @@ public class GeneralTreeTest {
     }
 
     @Test
-    public void breadthFirstVisitsLevelByLevel() {
+    public void levelOrderVisitsLevelByLevel() {
         assertEquals(
                 Arrays.asList("cs16/", "homeworks/", "programs/", "todo.txt", "h1c.doc",
                         "h1nc.doc", "DDR.java", "Stocks.java", "Robot.java"),
-                tree.breadthFirst());
+                tree.levelOrder());
     }
 
     @Test(expected = UnsupportedOperationException.class)

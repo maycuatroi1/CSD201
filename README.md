@@ -15,7 +15,7 @@ Mỗi bài là một thư mục độc lập, chỉ gồm file `.java`:
 
 ```
 java/<bài>/
-  src/    code mẫu, mỗi chủ đề một package, kèm một class *Demo có hàm main
+  src/    code mẫu, các class *Demo có hàm main để chạy thử
   test/   unit test JUnit 4 cho code trong src/
 ```
 
@@ -41,7 +41,7 @@ macOS, Linux hoặc Git Bash trên Windows, đứng trong thư mục bài (ví d
 ```bash
 mkdir -p out
 javac -d out $(find src -name "*.java")
-java -cp out csd201.tree.bst.BinarySearchTreeDemo
+java -cp out csd201.tree.sample.StudentTreeDemo
 ```
 
 Chạy test cần hai file jar của JUnit 4:
@@ -60,7 +60,7 @@ GitHub Actions chạy đúng các bước trên với JDK 8 và JDK 21 ở mỗi
 
 - Không comment trong code, không annotation trang trí. Tên class, method, biến phải tự nói lên ý
   nghĩa. Annotation duy nhất là `@Test` của JUnit.
-- Mỗi class làm một việc. Node là class private bên trong cấu trúc dữ liệu, bên ngoài không sửa
-  được cây mà không qua method công khai.
+- Mỗi class làm một việc. Bên ngoài chỉ đọc được `Node` (getter public), còn setter chỉ dùng được
+  trong package của cây, nên không ai phá được thứ tự của BST mà không qua method công khai.
 - Phép duyệt trả về `List` thay vì in ra màn hình, để test được và để Demo tự quyết cách in.
 - Ví dụ trong các Demo lấy từ slide và giáo trình, để sinh viên đối chiếu kết quả.

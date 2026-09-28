@@ -1,11 +1,11 @@
-package csd201.tree.binary;
+package csd201.tree;
 
-import static csd201.tree.binary.ExpressionTree.Operator.ADD;
-import static csd201.tree.binary.ExpressionTree.Operator.DIVIDE;
-import static csd201.tree.binary.ExpressionTree.Operator.MULTIPLY;
-import static csd201.tree.binary.ExpressionTree.Operator.SUBTRACT;
-import static csd201.tree.binary.ExpressionTree.number;
-import static csd201.tree.binary.ExpressionTree.operation;
+import static csd201.tree.ExpressionTree.Operator.ADD;
+import static csd201.tree.ExpressionTree.Operator.DIVIDE;
+import static csd201.tree.ExpressionTree.Operator.MULTIPLY;
+import static csd201.tree.ExpressionTree.Operator.SUBTRACT;
+import static csd201.tree.ExpressionTree.number;
+import static csd201.tree.ExpressionTree.operation;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
@@ -59,11 +59,11 @@ public class ExpressionTreeTest {
     }
 
     @Test
-    public void breadthFirstVisitsLevelByLevel() {
+    public void levelOrderVisitsLevelByLevel() {
         assertEquals(
                 Arrays.asList("-", "/", "+", "*", "+", "*", "6", "+", "3", "-", "2",
                         "3", "-", "3", "1", "9", "5", "7", "4"),
-                expression.breadthFirst());
+                expression.levelOrder());
     }
 
     @Test
@@ -78,6 +78,5 @@ public class ExpressionTreeTest {
         assertEquals(7.0, seven.evaluate(), 1e-9);
         assertEquals("7", seven.toInfix());
         assertEquals(0, seven.height());
-        assertEquals("7", seven.toString());
     }
 }

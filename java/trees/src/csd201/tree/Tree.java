@@ -1,83 +1,28 @@
 package csd201.tree;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 
-public abstract class Tree<E> {
+public interface Tree<T> {
 
-    protected abstract TreeNode<E> root();
+    Node<T> getRoot();
 
-    public boolean isEmpty() {
-        return root() == null;
-    }
+    boolean isEmpty();
 
-    public int size() {
-        return isEmpty() ? 0 : subtreeSize(root());
-    }
+    int size();
 
-    public int height() {
-        return isEmpty() ? -1 : subtreeHeight(root());
-    }
+    int height();
 
-    public List<E> preOrder() {
-        List<E> visited = new ArrayList<>();
-        if (!isEmpty()) {
-            preOrder(root(), visited);
-        }
-        return visited;
-    }
+    List<T> preOrder();
 
-    public List<E> postOrder() {
-        List<E> visited = new ArrayList<>();
-        if (!isEmpty()) {
-            postOrder(root(), visited);
-        }
-        return visited;
-    }
+    List<T> inOrder();
 
-    public List<E> breadthFirst() {
-        List<E> visited = new ArrayList<>();
-        Queue<TreeNode<E>> queue = new ArrayDeque<>();
-        if (!isEmpty()) {
-            queue.add(root());
-        }
-        while (!queue.isEmpty()) {
-            TreeNode<E> node = queue.remove();
-            visited.add(node.element());
-            queue.addAll(node.children());
-        }
-        return visited;
-    }
+    List<T> postOrder();
 
-    protected int subtreeHeight(TreeNode<E> node) {
-        int height = 0;
-        for (TreeNode<E> child : node.children()) {
-            height = Math.max(height, 1 + subtreeHeight(child));
-        }
-        return height;
-    }
+    List<T> levelOrder();
 
-    private int subtreeSize(TreeNode<E> node) {
-        int size = 1;
-        for (TreeNode<E> child : node.children()) {
-            size += subtreeSize(child);
-        }
-        return size;
-    }
+    Position<T> search(T value);
 
-    private void preOrder(TreeNode<E> node, List<E> visited) {
-        visited.add(node.element());
-        for (TreeNode<E> child : node.children()) {
-            preOrder(child, visited);
-        }
-    }
+    int getSearchCount();
 
-    private void postOrder(TreeNode<E> node, List<E> visited) {
-        for (TreeNode<E> child : node.children()) {
-            postOrder(child, visited);
-        }
-        visited.add(node.element());
-    }
+    void printTree();
 }

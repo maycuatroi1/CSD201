@@ -1,12 +1,13 @@
-package csd201.tree.binary;
+package csd201.tree.sample;
 
-import static csd201.tree.binary.ExpressionTree.Operator.ADD;
-import static csd201.tree.binary.ExpressionTree.Operator.DIVIDE;
-import static csd201.tree.binary.ExpressionTree.Operator.MULTIPLY;
-import static csd201.tree.binary.ExpressionTree.Operator.SUBTRACT;
-import static csd201.tree.binary.ExpressionTree.number;
-import static csd201.tree.binary.ExpressionTree.operation;
+import static csd201.tree.ExpressionTree.Operator.ADD;
+import static csd201.tree.ExpressionTree.Operator.DIVIDE;
+import static csd201.tree.ExpressionTree.Operator.MULTIPLY;
+import static csd201.tree.ExpressionTree.Operator.SUBTRACT;
+import static csd201.tree.ExpressionTree.number;
+import static csd201.tree.ExpressionTree.operation;
 
+import csd201.tree.ExpressionTree;
 import java.util.List;
 
 public final class ExpressionTreeDemo {
@@ -25,11 +26,12 @@ public final class ExpressionTreeDemo {
                 number(6));
         ExpressionTree expression = operation(quotient, SUBTRACT, sum);
 
+        expression.printTree();
         print("infix", expression.toInfix());
         print("pre-order", join(expression.preOrder()));
         print("in-order", join(expression.inOrder()));
         print("post-order", join(expression.postOrder()));
-        print("breadth-first", join(expression.breadthFirst()));
+        print("level-order", join(expression.levelOrder()));
         print("value", String.valueOf(expression.evaluate()));
         print("size", String.valueOf(expression.size()));
         print("height", String.valueOf(expression.height()));
