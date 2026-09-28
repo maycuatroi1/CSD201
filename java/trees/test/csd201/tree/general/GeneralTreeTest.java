@@ -2,12 +2,12 @@ package csd201.tree.general;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import csd201.tree.general.GeneralTree.Node;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.NoSuchElementException;
 import org.junit.Test;
 
 public class GeneralTreeTest {
@@ -80,6 +80,14 @@ public class GeneralTreeTest {
                 tree.postOrder());
     }
 
+    @Test
+    public void breadthFirstVisitsLevelByLevel() {
+        assertEquals(
+                Arrays.asList("cs16/", "homeworks/", "programs/", "todo.txt", "h1c.doc",
+                        "h1nc.doc", "DDR.java", "Stocks.java", "Robot.java"),
+                tree.breadthFirst());
+    }
+
     @Test(expected = UnsupportedOperationException.class)
     public void childrenListIsReadOnly() {
         tree.children(cs16).add(h1c);
@@ -91,16 +99,13 @@ public class GeneralTreeTest {
     }
 
     @Test
-    public void emptyTreeHasHeightMinusOne() {
+    public void emptyTreeHasNoRootAndHeightMinusOne() {
         GeneralTree<String> empty = new GeneralTree<>();
         assertTrue(empty.isEmpty());
+        assertNull(empty.root());
+        assertEquals(0, empty.size());
         assertEquals(-1, empty.height());
         assertEquals(Collections.emptyList(), empty.preOrder());
         assertEquals(Collections.emptyList(), empty.postOrder());
-    }
-
-    @Test(expected = NoSuchElementException.class)
-    public void emptyTreeHasNoRoot() {
-        new GeneralTree<String>().root();
     }
 }
