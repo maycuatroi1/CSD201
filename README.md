@@ -8,6 +8,7 @@ Goldwasser, *Data Structures and Algorithms in Java*, 6th edition.
 | Bài | Package | Syllabus |
 |---|---|---|
 | Cây: cây tổng quát, cây nhị phân, duyệt cây, BST, AVL | [`tree`](tree) | 4.1 đến 4.7 |
+| Đồ thị: danh sách kề, ma trận kề, DFS, BFS | [`graph`](graph) | 5.1 đến 5.3 |
 
 ## Cách tổ chức
 
