@@ -337,12 +337,7 @@ public class GraphVisualizer<T> {
     }
 
     private DefaultTableModel vertexTableModel() {
-        DefaultTableModel model = new DefaultTableModel(
-                new Object[] {"Vertex", "Degree", "Neighbors", "Comp."}, 0) {
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
+        DefaultTableModel model = new ReadOnlyTableModel(new Object[] {"Vertex", "Degree", "Neighbors", "Comp."});
         for (T v : vertices) {
             model.addRow(new Object[] {v, degree.get(v), neighborText(v), "#" + (componentOf.get(v) + 1)});
         }
@@ -812,6 +807,18 @@ public class GraphVisualizer<T> {
             g.drawString(name + " from " + order.get(0) + ": step " + step + " of " + order.size(), 12, 22);
             g.setFont(getFont().deriveFont(Font.PLAIN, 14f));
             g.drawString("Visited: " + (step == 0 ? "-" : join(order.subList(0, step))), 12, getHeight() - 12);
+        }
+    }
+
+    private static final class ReadOnlyTableModel extends DefaultTableModel {
+        private static final long serialVersionUID = 1L;
+
+        private ReadOnlyTableModel(Object[] columnNames) {
+            super(columnNames, 0);
+        }
+
+        public boolean isCellEditable(int row, int column) {
+            return false;
         }
     }
 
