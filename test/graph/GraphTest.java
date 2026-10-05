@@ -63,6 +63,12 @@ public class GraphTest {
     }
 
     @Test
+    public void zeroWeightIsStillAnEdge() {
+        assertZeroWeightEdge(new AdjacencyListGraph<>(Arrays.asList('a', 'b')));
+        assertZeroWeightEdge(new AdjacencyMatrixGraph<>(Arrays.asList('a', 'b')));
+    }
+
+    @Test
     public void selfLoopIsOneEdge() {
         assertSelfLoop(new AdjacencyListGraph<>(Arrays.asList('a')));
         assertSelfLoop(new AdjacencyMatrixGraph<>(Arrays.asList('a')));
@@ -129,6 +135,12 @@ public class GraphTest {
         graph.addEdge('b', 'a', 7);
         assertEquals("[a-b(7)]", graph.getEdges().toString());
         assertEquals(Arrays.asList('b'), graph.getNeighbors('a'));
+    }
+
+    private static void assertZeroWeightEdge(AbstractGraph<Character> graph) {
+        graph.addEdge('a', 'b', 0);
+        assertEquals("[a-b(0)]", graph.getEdges().toString());
+        assertEquals(Arrays.asList('a', 'b'), graph.breadthFirstTraversal('a'));
     }
 
     private static void assertSelfLoop(AbstractGraph<Character> graph) {

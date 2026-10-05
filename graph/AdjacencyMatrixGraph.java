@@ -9,7 +9,7 @@ public class AdjacencyMatrixGraph<T> extends AbstractGraph<T> {
 
     private final List<T> vertices = new ArrayList<>();
     private final Map<T, Integer> indexes = new HashMap<>();
-    private int[][] weights;
+    private Integer[][] weights;
 
     public AdjacencyMatrixGraph(List<T> vertices) {
         for (T vertex : vertices) {
@@ -17,7 +17,7 @@ public class AdjacencyMatrixGraph<T> extends AbstractGraph<T> {
                 register(vertex);
             }
         }
-        weights = new int[this.vertices.size()][this.vertices.size()];
+        weights = new Integer[this.vertices.size()][this.vertices.size()];
     }
 
     public void addVertex(T vertex) {
@@ -26,7 +26,7 @@ public class AdjacencyMatrixGraph<T> extends AbstractGraph<T> {
         }
         register(vertex);
         int size = vertices.size();
-        int[][] grown = new int[size][size];
+        Integer[][] grown = new Integer[size][size];
         for (int i = 0; i < weights.length; i++) {
             System.arraycopy(weights[i], 0, grown[i], 0, weights.length);
         }
@@ -52,7 +52,7 @@ public class AdjacencyMatrixGraph<T> extends AbstractGraph<T> {
         List<Edge<T>> edges = new ArrayList<>();
         for (int i = 0; i < weights.length; i++) {
             for (int j = i; j < weights.length; j++) {
-                if (weights[i][j] != 0) {
+                if (weights[i][j] != null) {
                     edges.add(new Edge<>(vertices.get(i), vertices.get(j), weights[i][j]));
                 }
             }
@@ -64,7 +64,7 @@ public class AdjacencyMatrixGraph<T> extends AbstractGraph<T> {
         int row = indexOf(vertex);
         List<T> neighbors = new ArrayList<>();
         for (int column = 0; column < weights.length; column++) {
-            if (weights[row][column] != 0) {
+            if (weights[row][column] != null) {
                 neighbors.add(vertices.get(column));
             }
         }

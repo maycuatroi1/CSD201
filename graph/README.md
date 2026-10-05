@@ -31,7 +31,8 @@ queue) một lần, chỉ dựa vào `getNeighbors`. Hai lớp con khác nhau �
 thứ tự thêm cạnh.
 
 **`AdjacencyMatrixGraph<T>`**: ô `[i][j]` là trọng số cạnh nối đỉnh thứ `i` với đỉnh thứ `j`, ô
-bằng 0 nghĩa là không có cạnh. Ma trận đối xứng qua đường chéo. Một `HashMap` giữ chỉ số của từng
+`null` nghĩa là không có cạnh. Ma trận kiểu `Integer[][]` thay cho `int[][]` để cạnh trọng số 0
+vẫn lưu được. Ma trận đối xứng qua đường chéo. Một `HashMap` giữ chỉ số của từng
 đỉnh để `addEdge` không phải tìm tuần tự. `getNeighbors` quét cả một hàng, nên đỉnh kề ra theo
 thứ tự đỉnh. `addVertex` cấp ma trận mới lớn hơn một hàng, một cột rồi chép dữ liệu cũ sang.
 
@@ -66,7 +67,6 @@ với cách nào thì cửa sổ không vẽ cạnh cây.
 - Đỉnh trùng bị bỏ qua, cả trong constructor lẫn `addVertex`.
 - `addEdge`, `getNeighbors` hoặc phép duyệt gặp đỉnh chưa có trong đồ thị thì ném
   `IllegalArgumentException`.
-- `AdjacencyMatrixGraph` dùng 0 để đánh dấu không có cạnh, nên không lưu được cạnh trọng số 0.
 
 ## Độ phức tạp
 
@@ -102,6 +102,15 @@ Chạy từ thư mục gốc của repo (JDK 22 trở lên):
 
 ```bash
 java graph/sample/SampleGraphDemo.java
+```
+
+Muốn thử đồ thị khác thì truyền file cạnh, và nếu cần thêm file đỉnh. File cạnh ghi mỗi dòng một
+cạnh dạng `a-c`, hoặc `a-c 4` khi có trọng số. File đỉnh ghi mỗi dòng một đỉnh, chỉ cần cho đỉnh
+cô lập và để quyết định thứ tự đỉnh, vì demo tự thêm hai đầu của mọi cạnh. Demo duyệt từ đỉnh
+đầu tiên.
+
+```bash
+java graph/sample/SampleGraphDemo.java edges.txt vertices.txt
 ```
 
 Với JDK cũ hơn, biên dịch trước:
