@@ -5,6 +5,7 @@
 | `graph` | `AbstractGraph`, `Edge` | 5.1 Graphs, 5.3 Graph Traversals | 14.1, 14.3 |
 | `graph` | `AdjacencyListGraph` | 5.2.2 Adjacency List Structure | 14.2.2 |
 | `graph` | `AdjacencyMatrixGraph` | 5.2.3 Adjacency Matrix Structure | 14.2.4 |
+| `graph` | `GraphVisualizer` | vẽ đồ thị, phát lại DFS và BFS | |
 | `graph.sample` | `SampleGraphDemo` | chạy thử | |
 
 ## Cây kế thừa
@@ -33,6 +34,28 @@ thứ tự thêm cạnh.
 bằng 0 nghĩa là không có cạnh. Ma trận đối xứng qua đường chéo. Một `HashMap` giữ chỉ số của từng
 đỉnh để `addEdge` không phải tìm tuần tự. `getNeighbors` quét cả một hàng, nên đỉnh kề ra theo
 thứ tự đỉnh. `addVertex` cấp ma trận mới lớn hơn một hàng, một cột rồi chép dữ liệu cũ sang.
+
+## GraphVisualizer
+
+Cửa sổ Swing vẽ đồ thị trên một vòng tròn, mỗi thành phần liên thông một màu. Khung bên phải ghi
+số đỉnh, số cạnh, mật độ, tổng bậc bằng hai lần số cạnh, đỉnh cô lập, đỉnh bậc lẻ và đồ thị có
+đường đi hay chu trình Euler không. Bảng Vertices ghi bậc, đỉnh kề và thành phần của từng đỉnh.
+Bấm vào một đỉnh để tô các cạnh của nó, kéo đỉnh để đổi vị trí.
+
+```java
+GraphVisualizer.show(graph, "My graph");
+GraphVisualizer.show(graph, "DFS from a", graph.depthFirstTraversal('a'), GraphVisualizer.Traversal.DFS);
+```
+
+Khi nhận thêm một thứ tự duyệt, cửa sổ phát lại từng bước: cạnh cây mọc dần thành mũi tên, khung
+Traversal ghi stack (DFS) hoặc queue (BFS) ở bước đang xem. Các nút Restart, Prev, Play, Next và
+thanh Delay điều khiển việc phát lại.
+
+Truyền `null` thay cho `Traversal.DFS` hay `Traversal.BFS` thì visualizer tự đoán. Với mỗi đỉnh
+trong thứ tự, cha của nó là đỉnh gần đỉnh stack nhất (DFS) hoặc gần đầu queue nhất (BFS) có cạnh
+nối tới nó, và một đỉnh chỉ rời stack hay queue khi mọi đỉnh kề của nó đã được thăm. Thứ tự hợp
+với cả hai cách thì visualizer chọn DFS, ví dụ `a, c, f, d, b, e` trên đồ thị mẫu. Thứ tự không hợp
+với cách nào thì cửa sổ không vẽ cạnh cây.
 
 ## Quy ước
 
@@ -69,7 +92,9 @@ DFS from a: [a, c, f, d, b, e]
 BFS from a: [a, c, d, f, b, e]
 ```
 
-Demo thêm cạnh theo thứ tự đỉnh nên hai cách biểu diễn cho cùng kết quả. Test
+Demo thêm cạnh theo thứ tự đỉnh nên hai cách biểu diễn cho cùng kết quả. Nếu máy có màn hình, demo
+mở thêm hai cửa sổ `GraphVisualizer` phát lại DFS và BFS từ `a`. Trên GitHub Actions không có màn
+hình, demo chỉ in ra console. Test
 `listKeepsNeighborsInInsertionOrderMatrixInVertexOrder` thêm cạnh `a-c` trước `a-b`, và lúc đó
 DFS của hai lớp ra hai thứ tự khác nhau.
 

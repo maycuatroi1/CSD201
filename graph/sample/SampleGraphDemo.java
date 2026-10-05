@@ -4,6 +4,8 @@ import graph.AbstractGraph;
 import graph.AdjacencyListGraph;
 import graph.AdjacencyMatrixGraph;
 import graph.Edge;
+import graph.GraphVisualizer;
+import java.awt.GraphicsEnvironment;
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,9 +15,15 @@ public class SampleGraphDemo {
     private static final String[] EDGES = {"a-c", "a-d", "a-f", "b-d", "b-e", "c-f", "d-e", "d-f"};
 
     public static void main(String[] args) {
-        show("Adjacency list", connect(new AdjacencyListGraph<>(VERTICES)));
+        AbstractGraph<Character> list = connect(new AdjacencyListGraph<>(VERTICES));
+        AbstractGraph<Character> matrix = connect(new AdjacencyMatrixGraph<>(VERTICES));
+        print("Adjacency list", list);
         System.out.println();
-        show("Adjacency matrix", connect(new AdjacencyMatrixGraph<>(VERTICES)));
+        print("Adjacency matrix", matrix);
+        if (!GraphicsEnvironment.isHeadless()) {
+            GraphVisualizer.show(list, "DFS from a", list.depthFirstTraversal('a'), GraphVisualizer.Traversal.DFS);
+            GraphVisualizer.show(list, "BFS from a", list.breadthFirstTraversal('a'), GraphVisualizer.Traversal.BFS);
+        }
     }
 
     private static AbstractGraph<Character> connect(AbstractGraph<Character> graph) {
@@ -25,7 +33,7 @@ public class SampleGraphDemo {
         return graph;
     }
 
-    private static void show(String title, AbstractGraph<Character> graph) {
+    private static void print(String title, AbstractGraph<Character> graph) {
         List<Edge<Character>> edges = graph.getEdges();
         System.out.println(title + ": " + graph.getVertices().size() + " vertices, " + edges.size() + " edges");
         for (Edge<Character> edge : edges) {
