@@ -206,14 +206,20 @@ public abstract class AbstractTree<T> implements Tree<T> {
         StringBuilder labelLine = new StringBuilder();
         StringBuilder edgeLine = new StringBuilder();
         if (left != null) {
-            labelLine.append(repeat(' ', left.rootColumn + 1)).append(repeat('_', left.width - left.rootColumn - 1));
-            edgeLine.append(repeat(' ', left.rootColumn)).append('/').append(repeat(' ', left.width - left.rootColumn - 1));
+            labelLine.append(repeat(' ', left.rootColumn + 1))
+                     .append(repeat('_', left.width - left.rootColumn - 1));
+            edgeLine.append(repeat(' ', left.rootColumn))
+                    .append('/')
+                    .append(repeat(' ', left.width - left.rootColumn - 1));
         }
         labelLine.append(label);
         edgeLine.append(repeat(' ', label.length()));
         if (right != null) {
-            labelLine.append(repeat('_', right.rootColumn)).append(repeat(' ', right.width - right.rootColumn));
-            edgeLine.append(repeat(' ', right.rootColumn)).append('\\').append(repeat(' ', right.width - right.rootColumn - 1));
+            labelLine.append(repeat('_', right.rootColumn))
+                     .append(repeat(' ', right.width - right.rootColumn));
+            edgeLine.append(repeat(' ', right.rootColumn))
+                    .append('\\')
+                    .append(repeat(' ', right.width - right.rootColumn - 1));
         }
         lines.add(labelLine.toString());
         lines.add(edgeLine.toString());
@@ -222,7 +228,9 @@ public abstract class AbstractTree<T> implements Tree<T> {
         int rightWidth = right == null ? 0 : right.width;
         int rows = Math.max(left == null ? 0 : left.lines.size(), right == null ? 0 : right.lines.size());
         for (int row = 0; row < rows; row++) {
-            lines.add(lineAt(left, row, leftWidth) + repeat(' ', label.length()) + lineAt(right, row, rightWidth));
+            lines.add(lineAt(left, row, leftWidth)
+                    + repeat(' ', label.length())
+                    + lineAt(right, row, rightWidth));
         }
         return new Drawing(lines, leftWidth + label.length() + rightWidth, leftWidth + label.length() / 2);
     }
