@@ -9,6 +9,13 @@ Goldwasser, *Data Structures and Algorithms in Java*, 6th edition.
 |---|---|---|
 | Cây: cây tổng quát, cây nhị phân, duyệt cây, BST, AVL | [`tree`](tree) | 4.1 đến 4.7 |
 | Đồ thị: danh sách kề, ma trận kề, DFS, BFS | [`graph`](graph) | 5.1 đến 5.3 |
+| Sắp xếp: selection, insertion, bubble, quick, merge | [`sort`](sort) | 6.1 đến 6.5, 6.8 |
+
+![Merge sort trong SortingVisualizer: hai nửa đã sắp xếp nổi trên mảng aux, phần tử nhỏ hơn ở đầu hai nửa được hạ về arr](docs/sort-merge.png)
+
+`sort.sample.SortingVisualizerDemo` mở cửa sổ trên và phát lại từng bước của năm thuật toán sắp xếp, trên mảng
+`Student`, mảng `Book` và một mảng số nguyên ngẫu nhiên. Cách dùng và ý nghĩa màu sắc xem ở
+[`sort/README.md`](sort/README.md).
 
 ## Cách tổ chức
 
