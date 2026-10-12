@@ -7,6 +7,9 @@ Goldwasser, *Data Structures and Algorithms in Java*, 6th edition.
 
 | Bài | Package | Syllabus |
 |---|---|---|
+| Danh sách liên kết đôi | [`list`](list) | 1.4 |
+| Stack: cài bằng mảng và bằng danh sách liên kết | [`stack`](stack) | 2.1 |
+| Queue: mảng vòng, HogwartsVisualizer vẽ queue và stack | [`queue`](queue) | 2.2 |
 | Cây: cây tổng quát, cây nhị phân, duyệt cây, BST, AVL | [`tree`](tree) | 4.1 đến 4.7 |
 | Đồ thị: danh sách kề, ma trận kề, DFS, BFS | [`graph`](graph) | 5.1 đến 5.3 |
 | Sắp xếp: selection, insertion, bubble, quick, merge | [`sort`](sort) | 6.1 đến 6.5, 6.8 |
