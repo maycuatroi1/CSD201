@@ -50,13 +50,9 @@ public class AdjacencyListGraph<T> extends AbstractGraph<T> {
         return edges;
     }
 
-    public List<T> getNeighbors(T vertex) {
+    public List<Edge<T>> getIncidentEdges(T vertex) {
         requireVertex(vertex);
-        List<T> neighbors = new ArrayList<>();
-        for (Edge<T> edge : adjacency.get(vertex)) {
-            neighbors.add(edge.getDest());
-        }
-        return neighbors;
+        return new ArrayList<>(adjacency.get(vertex));
     }
 
     private void putEdge(T src, T dest, int weight) {

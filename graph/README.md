@@ -5,16 +5,22 @@
 | `graph` | `AbstractGraph`, `Edge` | 5.1 Graphs, 5.3 Graph Traversals | 14.1, 14.3 |
 | `graph` | `AdjacencyListGraph` | 5.2.2 Adjacency List Structure | 14.2.2 |
 | `graph` | `AdjacencyMatrixGraph` | 5.2.3 Adjacency Matrix Structure | 14.2.4 |
+| `graph` | `PrimMST` | 5.5.1 Prim-Jarník Algorithm | 14.7.1 |
+| `graph` | `KruskalMST` | 5.5.2 Kruskal's Algorithm | 14.7.2, 14.7.3 |
 | `graph` | `GraphVisualizer` | vẽ đồ thị, phát lại DFS và BFS | |
-| `graph.sample` | `SampleGraphDemo` | chạy thử | |
+| `graph.sample` | `SampleGraphDemo` | chạy thử danh sách kề, ma trận kề, DFS, BFS | |
+| `graph.sample` | `MinimumSpanningTreeDemo` | chạy thử Prim và Kruskal | |
 
 ## Cây kế thừa
 
 ```
-AbstractGraph<T>                 addVertex, addEdge, hasVertex, getVertices, getEdges, getNeighbors
-│                                + depthFirstTraversal, breadthFirstTraversal
+AbstractGraph<T>                 addVertex, addEdge, hasVertex, getVertices, getEdges, getIncidentEdges
+│                                + getNeighbors, depthFirstTraversal, breadthFirstTraversal
 ├── AdjacencyListGraph<T>        mỗi đỉnh giữ danh sách cạnh của nó
 └── AdjacencyMatrixGraph<T>      ma trận trọng số V x V
+
+PrimMST<T>                       mọc một cây từ đỉnh xuất phát, hàng đợi ưu tiên giữ cạnh rời cây
+KruskalMST<T>                    thử cạnh từ nhẹ đến nặng, union-find chặn chu trình
 ```
 
 ## Các class chính
@@ -22,9 +28,14 @@ AbstractGraph<T>                 addVertex, addEdge, hasVertex, getVertices, get
 **`Edge<T>`**: hai đầu `src`, `dest` và trọng số `weight`. Tạo xong thì không sửa được.
 `toString` có dạng `a-c(1)`.
 
-**`AbstractGraph<T>`**: đồ thị vô hướng có trọng số. Lớp này cài đặt DFS (đệ quy) và BFS (dùng
-queue) một lần, chỉ dựa vào `getNeighbors`. Hai lớp con khác nhau ở cách lưu cạnh và cách liệt kê
-đỉnh kề, nên thứ tự đỉnh kề của mỗi lớp quyết định thứ tự duyệt DFS và BFS.
+**`AbstractGraph<T>`**: đồ thị vô hướng có trọng số. Lớp này cài đặt DFS (đệ quy), BFS (dùng
+queue) và `getNeighbors` một lần, chỉ dựa vào `getIncidentEdges`. Hai lớp con khác nhau ở cách lưu
+cạnh và cách liệt kê cạnh kề, nên thứ tự cạnh kề của mỗi lớp quyết định thứ tự duyệt DFS và BFS,
+và cả thứ tự Prim chọn cạnh khi có trọng số bằng nhau.
+
+`getIncidentEdges(v)` trả cạnh kề của `v` với `getSrc()` luôn là `v`, nên thuật toán đi theo cạnh
+biết mình vừa tới đỉnh nào: `getDest()` là đầu xa. `getNeighbors(v)` chỉ là `getDest()` của danh
+sách đó.
 
 **`AdjacencyListGraph<T>`**: một `LinkedHashMap` từ mỗi đỉnh tới danh sách `Edge` đi ra từ đỉnh
 đó. Cạnh vô hướng `a-c` nằm trong danh sách của cả `a` lẫn `c`. `getNeighbors` trả đỉnh kề theo
@@ -35,6 +46,42 @@ thứ tự thêm cạnh.
 vẫn lưu được. Ma trận đối xứng qua đường chéo. Một `HashMap` giữ chỉ số của từng
 đỉnh để `addEdge` không phải tìm tuần tự. `getNeighbors` quét cả một hàng, nên đỉnh kề ra theo
 thứ tự đỉnh. `addVertex` cấp ma trận mới lớn hơn một hàng, một cột rồi chép dữ liệu cũ sang.
+
+## Cây khung nhỏ nhất
+
+Cây khung nhỏ nhất (minimum spanning tree) của đồ thị liên thông có trọng số là tập cạnh nối mọi
+đỉnh, không có chu trình, và tổng trọng số nhỏ nhất. Hai thuật toán dưới đây nhận một
+`AbstractGraph` và trả về danh sách cạnh của cây cùng tổng trọng số. Chúng không sửa đồ thị.
+
+**`PrimMST<T>`**: mọc một cây duy nhất từ đỉnh xuất phát. Hàng đợi ưu tiên giữ các cạnh rời cây;
+cạnh nhẹ nhất mà đầu xa còn ở ngoài sẽ nhập cây, rồi các cạnh của đỉnh mới vào hàng đợi. Cạnh lấy
+ra mà đầu xa đã kịp vào cây thì bỏ đi, nên không phải giảm khoá của phần tử đang nằm trong hàng
+đợi, chỉ cần `PriorityQueue` của JDK. `getEdges` trả cạnh theo thứ tự nhập cây, `getVertices` trả
+đỉnh theo thứ tự nhập cây, và chỉ gồm thành phần liên thông của đỉnh xuất phát.
+
+```java
+PrimMST<String> prim = new PrimMST<>(graph, "A");
+prim.getEdges();     // [A-B(7), A-C(9), C-F(2), F-E(9), E-D(6)]
+prim.getWeight();    // 33
+prim.getVertices();  // [A, B, C, F, E, D]
+```
+
+**`KruskalMST<T>`**: thử các cạnh từ nhẹ đến nặng, giữ cạnh khi hai đầu thuộc hai cây khác nhau, và
+việc giữ cạnh gộp hai cây đó thành một. Union-find trả lời câu hỏi "hai đầu cùng một cây chưa":
+`find` leo từ một đỉnh lên gốc cây của nó, `union` treo gốc này dưới gốc kia. Hai mẹo làm cho mỗi
+lần hỏi gần như O(1): `find` nén đường đi (mọi đỉnh trên đường trỏ thẳng vào gốc), và `union` treo
+cây thấp dưới cây cao, so bằng `rank` là chặn trên của chiều cao. Đồ thị không liên thông thì kết
+quả là rừng khung nhỏ nhất, mỗi thành phần một cây.
+
+```java
+KruskalMST<String> kruskal = new KruskalMST<>(graph);
+kruskal.getEdges();   // [C-F(2), D-E(6), A-B(7), A-C(9), E-F(9)]
+kruskal.getWeight();  // 33
+```
+
+Hai ví dụ trên chạy trên đồ thị của `MinimumSpanningTreeDemo`: cùng một cây, tìm ra theo hai thứ
+tự khác nhau. Prim luôn có đúng một cây đang mọc nên cạnh ra theo thứ tự nhập cây, còn Kruskal
+gom dần nhiều cây rời rạc nên cạnh ra theo trọng số tăng dần.
 
 ## GraphVisualizer
 
@@ -65,8 +112,13 @@ với cách nào thì cửa sổ không vẽ cạnh cây.
 - `getEdges` liệt kê mỗi cạnh đúng một lần, đầu `src` đứng trước `dest` theo thứ tự đỉnh.
 - Khuyên `a-a` tính là một cạnh, và `a` là đỉnh kề của chính nó.
 - Đỉnh trùng bị bỏ qua, cả trong constructor lẫn `addVertex`.
-- `addEdge`, `getNeighbors` hoặc phép duyệt gặp đỉnh chưa có trong đồ thị thì ném
-  `IllegalArgumentException`.
+- `addEdge`, `getIncidentEdges`, `getNeighbors`, phép duyệt hoặc `PrimMST` gặp đỉnh chưa có trong
+  đồ thị thì ném `IllegalArgumentException`.
+- Khuyên không bao giờ nhập cây khung: Prim không xếp nó vào hàng đợi, Kruskal thấy hai đầu cùng
+  một cây nên bỏ qua.
+- Trọng số bằng nhau cho nhiều cây khung nhỏ nhất, hai thuật toán chọn tất định: Prim ưu tiên cạnh
+  vào hàng đợi trước, Kruskal giữ thứ tự của `getEdges` vì sắp xếp ổn định. Đổi cách biểu diễn hay
+  đổi thứ tự thêm cạnh thì cây đổi theo, tổng trọng số thì không.
 
 ## Độ phức tạp
 
@@ -78,9 +130,11 @@ V là số đỉnh, E là số cạnh, deg(v) là bậc của đỉnh v.
 | `hasVertex` | O(1) | O(1) |
 | `addVertex` | O(1) | O(V²) |
 | `addEdge(u, v)` | O(deg(u) + deg(v)), vì phải dò cạnh trùng | O(1) |
-| `getNeighbors(v)` | O(deg(v)) | O(V) |
+| `getIncidentEdges(v)`, `getNeighbors(v)` | O(deg(v)) | O(V) |
 | `getEdges` | O(V + E) | O(V²) |
 | DFS, BFS | O(V + E) | O(V²) |
+| `PrimMST` | O(E log E) | O(V² + E log E) |
+| `KruskalMST` | O(E log E) | O(V² + E log E) |
 
 ## Sample
 
@@ -113,12 +167,34 @@ cô lập và để quyết định thứ tự đỉnh, vì demo tự thêm hai 
 java graph/sample/SampleGraphDemo.java edges.txt vertices.txt
 ```
 
+`MinimumSpanningTreeDemo` dựng đồ thị 6 đỉnh `A` đến `F`, 9 cạnh có trọng số của đề Sample PE
+câu 3 f2, rồi chạy Prim từ `A`, Prim từ `D` và Kruskal:
+
+```
+Prim from A: weight 33, 5 edges [A-B(7), A-C(9), C-F(2), F-E(9), E-D(6)]
+Prim from D: weight 33, 5 edges [D-E(6), E-F(9), F-C(2), C-A(9), A-B(7)]
+Kruskal: weight 33, 5 edges [C-F(2), D-E(6), A-B(7), A-C(9), E-F(9)]
+```
+
+Ba cây chứa đúng một tập cạnh, chỉ khác thứ tự tìm ra và khác đầu nào là `src`. Demo chạy lại
+bằng ma trận kề để thấy cùng kết quả, rồi dựng một đồ thị hai thành phần `P-Q-R` và `S-T`: Prim từ
+`P` chỉ với tới `[P, Q, R]`, còn Kruskal trả 3 cạnh, là rừng khung của cả hai thành phần. Nếu máy
+có màn hình, demo mở thêm hai cửa sổ `GraphVisualizer`: đồ thị gốc và cây Prim dựng lại thành một
+đồ thị, để so hai hình.
+
+Chạy từ thư mục gốc của repo (JDK 22 trở lên):
+
+```bash
+java graph/sample/MinimumSpanningTreeDemo.java
+```
+
 Với JDK cũ hơn, biên dịch trước:
 
 ```bash
 mkdir -p out
 javac -d out $(find graph -name "*.java")
 java -cp out graph.sample.SampleGraphDemo
+java -cp out graph.sample.MinimumSpanningTreeDemo
 ```
 
 Cách chạy test và mở bằng IDE: xem [README ở thư mục gốc](../README.md).

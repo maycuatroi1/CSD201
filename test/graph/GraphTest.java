@@ -34,6 +34,12 @@ public class GraphTest {
     }
 
     @Test
+    public void incidentEdgesStartAtTheQueriedVertex() {
+        assertEquals("[d-a(1), d-b(1), d-e(1), d-f(1)]", sampleList().getIncidentEdges('d').toString());
+        assertEquals("[d-a(1), d-b(1), d-e(1), d-f(1)]", sampleMatrix().getIncidentEdges('d').toString());
+    }
+
+    @Test
     public void isolatedVertexHasNoNeighbors() {
         assertEquals(Collections.emptyList(), sampleList().getNeighbors('g'));
         assertEquals(Collections.emptyList(), sampleMatrix().getNeighbors('g'));

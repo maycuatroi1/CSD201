@@ -60,15 +60,15 @@ public class AdjacencyMatrixGraph<T> extends AbstractGraph<T> {
         return edges;
     }
 
-    public List<T> getNeighbors(T vertex) {
+    public List<Edge<T>> getIncidentEdges(T vertex) {
         int row = indexOf(vertex);
-        List<T> neighbors = new ArrayList<>();
+        List<Edge<T>> incident = new ArrayList<>();
         for (int column = 0; column < weights.length; column++) {
             if (weights[row][column] != null) {
-                neighbors.add(vertices.get(column));
+                incident.add(new Edge<>(vertex, vertices.get(column), weights[row][column]));
             }
         }
-        return neighbors;
+        return incident;
     }
 
     private void register(T vertex) {

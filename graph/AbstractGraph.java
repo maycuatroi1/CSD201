@@ -19,7 +19,15 @@ public abstract class AbstractGraph<T> {
 
     public abstract List<Edge<T>> getEdges();
 
-    public abstract List<T> getNeighbors(T vertex);
+    public abstract List<Edge<T>> getIncidentEdges(T vertex);
+
+    public List<T> getNeighbors(T vertex) {
+        List<T> neighbors = new ArrayList<>();
+        for (Edge<T> edge : getIncidentEdges(vertex)) {
+            neighbors.add(edge.getDest());
+        }
+        return neighbors;
+    }
 
     public List<T> depthFirstTraversal(T startVertex) {
         requireVertex(startVertex);
