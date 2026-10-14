@@ -13,16 +13,24 @@ public class KruskalMST<T> {
     private int weight;
 
     public KruskalMST(AbstractGraph<T> graph) {
+        this(graph, new GraphAlgorithmObserver<T>() { });
+    }
+
+    public KruskalMST(AbstractGraph<T> graph, GraphAlgorithmObserver<T> observer) {
         for (T vertex : graph.getVertices()) {
             parent.put(vertex, vertex);
             rank.put(vertex, 0);
         }
         List<Edge<T>> lightestFirst = new ArrayList<>(graph.getEdges());
         lightestFirst.sort((first, second) -> Integer.compare(first.getWeight(), second.getWeight()));
+        observer.edgesSorted(new ArrayList<>(lightestFirst));
         for (Edge<T> edge : lightestFirst) {
             if (union(edge.getSrc(), edge.getDest())) {
                 treeEdges.add(edge);
                 weight += edge.getWeight();
+                observer.edgeAdded(edge);
+            } else {
+                observer.edgeSkipped(edge);
             }
         }
     }

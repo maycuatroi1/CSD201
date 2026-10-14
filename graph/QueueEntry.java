@@ -16,6 +16,10 @@ final class QueueEntry<E> implements Comparable<QueueEntry<E>> {
         return item;
     }
 
+    int getKey() {
+        return key;
+    }
+
     public int compareTo(QueueEntry<E> other) {
         if (key != other.key) {
             return Integer.compare(key, other.key);

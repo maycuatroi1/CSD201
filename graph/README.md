@@ -5,11 +5,16 @@
 | `graph` | `AbstractGraph`, `Edge` | 5.1 Graphs, 5.3 Graph Traversals | 14.1, 14.3 |
 | `graph` | `AdjacencyListGraph` | 5.2.2 Adjacency List Structure | 14.2.2 |
 | `graph` | `AdjacencyMatrixGraph` | 5.2.3 Adjacency Matrix Structure | 14.2.4 |
+| `graph` | `DijkstraShortestPath` | 5.4 Shortest Paths, 5.4.2 Dijkstra's Algorithm | 14.6.2 |
 | `graph` | `PrimMST` | 5.5.1 Prim-Jarník Algorithm | 14.7.1 |
 | `graph` | `KruskalMST` | 5.5.2 Kruskal's Algorithm | 14.7.2, 14.7.3 |
+| `graph` | `GraphAlgorithmObserver` | móc nối để theo dõi từng bước của ba thuật toán | |
 | `graph` | `GraphVisualizer` | vẽ đồ thị, phát lại DFS và BFS | |
+| `graph` | `WeightedGraphVisualizer` | phát lại Dijkstra, Prim, Kruskal từng bước | |
 | `graph.sample` | `SampleGraphDemo` | chạy thử danh sách kề, ma trận kề, DFS, BFS | |
+| `graph.sample` | `ShortestPathDemo` | chạy thử Dijkstra | |
 | `graph.sample` | `MinimumSpanningTreeDemo` | chạy thử Prim và Kruskal | |
+| `graph.sample` | `SampleWeightedGraph` | đồ thị có trọng số dùng chung cho hai demo | |
 
 ## Cây kế thừa
 
@@ -19,9 +24,15 @@ AbstractGraph<T>                 addVertex, addEdge, hasVertex, getVertices, get
 ├── AdjacencyListGraph<T>        mỗi đỉnh giữ danh sách cạnh của nó
 └── AdjacencyMatrixGraph<T>      ma trận trọng số V x V
 
+DijkstraShortestPath<T>          đường đi ngắn nhất từ một nguồn, trọng số không âm
 PrimMST<T>                       mọc một cây từ đỉnh xuất phát, hàng đợi ưu tiên giữ cạnh rời cây
 KruskalMST<T>                    thử cạnh từ nhẹ đến nặng, union-find chặn chu trình
 ```
+
+Ba thuật toán trên nhận thêm một `GraphAlgorithmObserver` không bắt buộc, báo lại từng quyết định
+(`started`, `edgeQueued`, `edgeAdded`, `edgeSkipped`, `vertexSettled`, `staleEntrySkipped`,
+`edgeRelaxed`, `edgesSorted`). `WeightedGraphVisualizer` ghi lại các báo cáo đó thành danh sách
+bước để phát lại. Mọi method của observer đều có thân rỗng sẵn, nên chỉ cần viết method mình cần.
 
 ## Các class chính
 
@@ -46,6 +57,26 @@ thứ tự thêm cạnh.
 vẫn lưu được. Ma trận đối xứng qua đường chéo. Một `HashMap` giữ chỉ số của từng
 đỉnh để `addEdge` không phải tìm tuần tự. `getNeighbors` quét cả một hàng, nên đỉnh kề ra theo
 thứ tự đỉnh. `addVertex` cấp ma trận mới lớn hơn một hàng, một cột rồi chép dữ liệu cũ sang.
+
+## Đường đi ngắn nhất
+
+**`DijkstraShortestPath<T>`**: khoảng cách ngắn nhất từ một đỉnh nguồn tới mọi đỉnh, với đồ thị
+trọng số không âm. Hàng đợi ưu tiên giữ cặp (đỉnh, khoảng cách). `PriorityQueue` của JDK không hạ
+được khoá của phần tử đang nằm trong hàng đợi, nên tìm được đường ngắn hơn thì thêm hẳn một cặp
+mới; cặp cũ lấy ra sau sẽ bị bỏ vì đỉnh của nó đã chốt. Đỉnh rời hàng đợi là đỉnh có khoảng cách
+nhỏ nhất trong số chưa chốt, và vì không có cạnh âm nên không đường nào tới nó ngắn hơn được nữa.
+
+```java
+DijkstraShortestPath<String> paths = new DijkstraShortestPath<>(graph, "A");
+paths.distanceTo("E");   // 20
+paths.pathTo("E");       // [A, C, F, E]
+paths.hasPathTo("S");    // false khi S ở thành phần khác
+```
+
+Không có đường thì `distanceTo` trả `Integer.MAX_VALUE` và `pathTo` trả danh sách rỗng. Gặp cạnh
+âm thì constructor ném `IllegalArgumentException` ngay, vì thuật toán sẽ cho kết quả sai: đường đi
+qua cạnh âm có thể ngắn hơn sau khi đỉnh đã chốt. Đồ thị có cạnh âm cần Bellman-Ford, không có
+trong môn này.
 
 ## Cây khung nhỏ nhất
 
@@ -105,6 +136,28 @@ nối tới nó, và một đỉnh chỉ rời stack hay queue khi mọi đỉnh
 với cả hai cách thì visualizer chọn DFS, ví dụ `a, c, f, d, b, e` trên đồ thị mẫu. Thứ tự không hợp
 với cách nào thì cửa sổ không vẽ cạnh cây.
 
+## WeightedGraphVisualizer
+
+Cửa sổ Swing phát lại Dijkstra, Prim hoặc Kruskal trên đồ thị có trọng số, mỗi bước một quyết
+định. Thanh công cụ đổi thuật toán và đỉnh xuất phát, các nút Restart, Prev, Play, Next và phím
+mũi tên trái phải đi tới lui, thanh Delay chỉnh tốc độ. Khung Step viết thuật toán đang nghĩ gì,
+khung dưới là hàng đợi ưu tiên (Dijkstra, Prim) hay danh sách cạnh đã sắp xếp (Kruskal), khung
+State là bảng khoảng cách và đỉnh trước (Dijkstra) hay trọng số cây và các cây rời rạc (Prim,
+Kruskal). Với Dijkstra, bấm vào một đỉnh để tô đường đi ngắn nhất tới nó tìm được tới bước đang
+xem. Kéo đỉnh để đổi vị trí, nút Reset layout xếp lại thành vòng tròn.
+
+```java
+WeightedGraphVisualizer.show(graph, "Dijkstra from A", WeightedGraphVisualizer.Algorithm.DIJKSTRA, "A", "E");
+WeightedGraphVisualizer.show(graph, "Prim from A", WeightedGraphVisualizer.Algorithm.PRIM, "A");
+WeightedGraphVisualizer.show(graph, "Kruskal", WeightedGraphVisualizer.Algorithm.KRUSKAL, null);
+```
+
+Phần mô hình tách khỏi phần vẽ: `record(graph, algorithm, start)` chạy thuật toán với một observer
+và trả về danh sách bước, kiểm tra được mà không mở cửa sổ. `WeightedGraphVisualizerTest` so đúng
+tên của từng bước, ví dụ Prim trên đồ thị mẫu ra `Start at A`, năm bước `Add ...` rồi bốn bước
+`Skip ...` khi dọn nốt hàng đợi. Đồ thị không chạy được (không có đỉnh, hoặc cạnh âm với Dijkstra)
+cho đúng một bước nói rõ lý do, thay vì ném lỗi ra cửa sổ.
+
 ## Quy ước
 
 - `addEdge(a, b, w)` và `addEdge(b, a, w)` là cùng một cạnh. Thêm lại cạnh đã có thì trọng số mới
@@ -112,8 +165,9 @@ với cách nào thì cửa sổ không vẽ cạnh cây.
 - `getEdges` liệt kê mỗi cạnh đúng một lần, đầu `src` đứng trước `dest` theo thứ tự đỉnh.
 - Khuyên `a-a` tính là một cạnh, và `a` là đỉnh kề của chính nó.
 - Đỉnh trùng bị bỏ qua, cả trong constructor lẫn `addVertex`.
-- `addEdge`, `getIncidentEdges`, `getNeighbors`, phép duyệt hoặc `PrimMST` gặp đỉnh chưa có trong
-  đồ thị thì ném `IllegalArgumentException`.
+- `addEdge`, `getIncidentEdges`, `getNeighbors`, phép duyệt, `PrimMST` hoặc `DijkstraShortestPath`
+  gặp đỉnh chưa có trong đồ thị thì ném `IllegalArgumentException`. `DijkstraShortestPath` ném cả
+  khi đồ thị có cạnh trọng số âm.
 - Khuyên không bao giờ nhập cây khung: Prim không xếp nó vào hàng đợi, Kruskal thấy hai đầu cùng
   một cây nên bỏ qua.
 - Trọng số bằng nhau cho nhiều cây khung nhỏ nhất, hai thuật toán chọn tất định: Prim ưu tiên cạnh
@@ -133,6 +187,7 @@ V là số đỉnh, E là số cạnh, deg(v) là bậc của đỉnh v.
 | `getIncidentEdges(v)`, `getNeighbors(v)` | O(deg(v)) | O(V) |
 | `getEdges` | O(V + E) | O(V²) |
 | DFS, BFS | O(V + E) | O(V²) |
+| `DijkstraShortestPath` | O(E log E) | O(V² + E log E) |
 | `PrimMST` | O(E log E) | O(V² + E log E) |
 | `KruskalMST` | O(E log E) | O(V² + E log E) |
 
@@ -167,8 +222,22 @@ cô lập và để quyết định thứ tự đỉnh, vì demo tự thêm hai 
 java graph/sample/SampleGraphDemo.java edges.txt vertices.txt
 ```
 
-`MinimumSpanningTreeDemo` dựng đồ thị 6 đỉnh `A` đến `F`, 9 cạnh có trọng số của đề Sample PE
-câu 3 f2, rồi chạy Prim từ `A`, Prim từ `D` và Kruskal:
+`ShortestPathDemo` và `MinimumSpanningTreeDemo` dùng chung đồ thị 6 đỉnh `A` đến `F`, 9 cạnh có
+trọng số của đề Sample PE câu 3 f2, dựng trong `SampleWeightedGraph`.
+
+`ShortestPathDemo` chạy Dijkstra từ `A`:
+
+```
+  to D    distance   20  path [A, C, D]
+  to E    distance   20  path [A, C, F, E]
+  to F    distance   11  path [A, C, F]
+```
+
+Đề hỏi đường từ `A` tới `E`: `A-C-F-E` tốn 9 + 2 + 9 = 20, trong khi đường ít cạnh hơn `A-F-E` tốn
+14 + 9 = 23. Demo chạy lại trên đồ thị hai thành phần để thấy `no path`, rồi mở
+`WeightedGraphVisualizer` phát lại Dijkstra từ `A` với đích `E`.
+
+`MinimumSpanningTreeDemo` chạy Prim từ `A`, Prim từ `D` và Kruskal:
 
 ```
 Prim from A: weight 33, 5 edges [A-B(7), A-C(9), C-F(2), F-E(9), E-D(6)]
@@ -179,12 +248,12 @@ Kruskal: weight 33, 5 edges [C-F(2), D-E(6), A-B(7), A-C(9), E-F(9)]
 Ba cây chứa đúng một tập cạnh, chỉ khác thứ tự tìm ra và khác đầu nào là `src`. Demo chạy lại
 bằng ma trận kề để thấy cùng kết quả, rồi dựng một đồ thị hai thành phần `P-Q-R` và `S-T`: Prim từ
 `P` chỉ với tới `[P, Q, R]`, còn Kruskal trả 3 cạnh, là rừng khung của cả hai thành phần. Nếu máy
-có màn hình, demo mở thêm hai cửa sổ `GraphVisualizer`: đồ thị gốc và cây Prim dựng lại thành một
-đồ thị, để so hai hình.
+có màn hình, demo mở thêm hai cửa sổ `WeightedGraphVisualizer` phát lại Prim và Kruskal.
 
 Chạy từ thư mục gốc của repo (JDK 22 trở lên):
 
 ```bash
+java graph/sample/ShortestPathDemo.java
 java graph/sample/MinimumSpanningTreeDemo.java
 ```
 
@@ -194,6 +263,7 @@ Với JDK cũ hơn, biên dịch trước:
 mkdir -p out
 javac -d out $(find graph -name "*.java")
 java -cp out graph.sample.SampleGraphDemo
+java -cp out graph.sample.ShortestPathDemo
 java -cp out graph.sample.MinimumSpanningTreeDemo
 ```
 
