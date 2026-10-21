@@ -13,6 +13,7 @@ Goldwasser, *Data Structures and Algorithms in Java*, 6th edition.
 | Cây: cây tổng quát, cây nhị phân, duyệt cây, BST, AVL | [`tree`](tree) | 4.1 đến 4.7 |
 | Đồ thị: danh sách kề, ma trận kề, DFS, BFS, Dijkstra, cây khung nhỏ nhất Prim và Kruskal | [`graph`](graph) | 5.1 đến 5.5 |
 | Sắp xếp: selection, insertion, bubble, quick, merge | [`sort`](sort) | 6.1 đến 6.5, 6.8 |
+| Bảng băm: linear, quadratic, double hashing, separate chaining, rehash | [`hash`](hash) | 7.1 đến 7.5 |
 
 ![Merge sort trong SortingVisualizer: hai nửa đã sắp xếp nổi trên mảng aux, phần tử nhỏ hơn ở đầu hai nửa được hạ về arr](docs/sort-merge.png)
 
