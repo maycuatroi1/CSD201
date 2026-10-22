@@ -2,6 +2,7 @@
 
 | Package | Class | Syllabus | Giáo trình |
 |---|---|---|---|
+| `hash` | `HashFunctions`: division, shift/boundary folding, mid-square, extraction, radix transformation, hash code đa thức (31), MAD | 7.2 Hash Functions | 10.2.1 |
 | `hash` | `OpenAddressingHashTable` | 7.3 Collision-Handling: open addressing, xoá bằng ô đánh dấu | 10.2.2 |
 | `hash` | `LinearProbingHashTable` | 7.3 linear probing, p(i) = i | 10.2.2 |
 | `hash` | `QuadraticProbingHashTable` | 7.3 quadratic probing, p(i) = i² | 10.2.2 |
@@ -40,10 +41,15 @@ ChainingHashTable<K, V>           mỗi ô là một LinkedList<Entry<K, V>>
 | Rehash | 15, 22, 8, 1 vào M = 7 | λ vượt 0.5, bảng mới M = 17 |
 | Separate chaining | A5, A2, A3, B5, A9, B2, B9, C2 là 5, 2, 3, 15, 9, 12, 19, 22 | ô 2 chứa 2, 12, 22 |
 
+`HashFunctionDemo` in kết quả từng hàm băm trên ví dụ của slide: 72320354121324 gấp thành 704 và 902,
+3121 bình phương lấy giữa được 406, 123-45-6789 trích được 1289, 345 cơ số 9 là 423, bốn từ stop, tops,
+pots, spot cùng tổng mã 454 nhưng khác hash code, và tám khóa tận cùng 0 rải ra sáu ô với MAD.
+
 `JavaHashMapDemo` dùng `HashSet` tìm từ lặp, `HashMap` đếm số lần xuất hiện của từ, và `StudentId`
 (có `equals` và `hashCode`) làm khoá của `HashMap`.
 
 ```bash
+java -cp out hash.sample.HashFunctionDemo
 java -cp out hash.sample.HashTableDemo
 java -cp out hash.sample.JavaHashMapDemo
 ```
